@@ -20,6 +20,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         const usersCollection = client.db('zedblock').collection('users')
+        const tasksCollection = client.db('zedblock').collection('tasks')
 
         //* register
         app.post('/register', async (req, res) => {
@@ -41,6 +42,32 @@ async function run() {
                 return res.send({ message: 'User not found' })
             }
             res.send({ user: user });
+        })
+
+        //* get tasks 
+        app.get('/get-tasks', async (req, res) => {
+            const name = req.query.name;
+            const password = req.query.password;
+            const query = {
+                name,
+                password
+            };
+            const tasks = await tasksCollection.find(query).toArray();
+            res.send(tasks)
+        })
+
+        //* 
+        app.post('/status', async (req, res) => {
+            const status = req.query.status;
+            const user = req.body;
+            const filter = { name: user.name, password: user.password };
+            const updateDoc = {
+                $set: {
+                    status
+                }
+            };
+            const result = await tasksCollection.updateOne(filter, updateDoc);
+            res.send(result);
         })
 
 
