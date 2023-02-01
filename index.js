@@ -58,16 +58,23 @@ async function run() {
 
         //* change checkbox status
         app.put('/status', async (req, res) => {
-            const status = JSON.parse(req.query.status);
-            const user = req.body;
-            const filter = { name: user.name, password: user.password };
-            const updateDoc = {
-                $set: {
-                    status
-                }
+            const id = req.query.id
+            const name = req.body.name
+            const password = req.body.password;
+            const state = req.query.state;
+            const filter = {
+                _id: new ObjectId(id),
+                name,
+                password
             };
-            const result = await tasksCollection.updateOne(filter, updateDoc);
-            res.send(result);
+            const updatedDoc = {
+                $set: {
+                    status: state
+                }
+            }
+            const result = await tasksCollection.updateOne(filter, updatedDoc);
+            res.send(result)
+
         })
 
         //* get task by id
@@ -103,6 +110,24 @@ async function run() {
             const task = req.body;
             const result = await tasksCollection.insertOne(task);
             res.send(result);
+        })
+
+        //* edit task
+        app.patch('/edit-task', async (req, res) => {
+            const editedTask = req.body;
+            const filter = {
+                _id: new ObjectId(editedTask.id),
+                name: editedTask.name,
+                password: editedTask.password
+            };
+            const updatedDoc = {
+                $set: {
+                    title: editedTask.title,
+                    description: editedTask.description
+                }
+            };
+            const result = await tasksCollection.updateOne(filter, updatedDoc);
+            res.send(result)
         })
 
 
