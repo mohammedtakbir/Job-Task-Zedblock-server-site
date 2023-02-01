@@ -98,6 +98,13 @@ async function run() {
             res.send(result)
         })
 
+        //* add task
+        app.post('/add-task', async (req, res) => {
+            const task = req.body;
+            const result = await tasksCollection.insertOne(task);
+            res.send(result);
+        })
+
 
     }
     finally {
