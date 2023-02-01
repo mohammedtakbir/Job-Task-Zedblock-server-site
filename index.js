@@ -61,7 +61,7 @@ async function run() {
             const id = req.query.id
             const name = req.body.name
             const password = req.body.password;
-            const state = req.query.state;
+            const state = JSON.parse(req.query.state);
             const filter = {
                 _id: new ObjectId(id),
                 name,
@@ -130,6 +130,18 @@ async function run() {
             res.send(result)
         })
 
+        //* remove completed tasks
+        app.get('/remove-completed-tasks', async (req, res) => {
+            const query = {};
+            const allTasks = await tasksCollection.find(query).toArray();
+
+            const completedTasks = allTasks.filter(task => task.status === true);
+            const mapCompletedTasks = completedTasks.map(async (task) => {
+                const result = await tasksCollection.deleteOne({ _id: new ObjectId(task._id) });
+            })
+            const activeTasks = allTasks.filter(task => task.status === false);
+            res.send(activeTasks);
+        })
 
     }
     finally {
