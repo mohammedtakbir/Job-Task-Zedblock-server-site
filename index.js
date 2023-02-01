@@ -3,7 +3,7 @@ const app = express();
 const cors = require('cors');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 //* middleware
 app.use(cors());
@@ -56,9 +56,9 @@ async function run() {
             res.send(tasks)
         })
 
-        //* 
-        app.post('/status', async (req, res) => {
-            const status = req.query.status;
+        //* change checkbox status
+        app.put('/status', async (req, res) => {
+            const status = JSON.parse(req.query.status);
             const user = req.body;
             const filter = { name: user.name, password: user.password };
             const updateDoc = {
@@ -68,6 +68,34 @@ async function run() {
             };
             const result = await tasksCollection.updateOne(filter, updateDoc);
             res.send(result);
+        })
+
+        //* get task by id
+        app.get('/get-task', async (req, res) => {
+            const id = req.query.id;
+            const name = req.query.name;
+            const password = req.query.password;
+            const query = {
+                _id: new ObjectId(id),
+                name,
+                password
+            }
+            const task = await tasksCollection.findOne(query)
+            res.send(task)
+        })
+
+        //* delete task
+        app.delete('/delete-task', async (req, res) => {
+            const id = req.query.id;
+            const name = req.query.name;
+            const password = req.query.password;
+            const query = {
+                _id: new ObjectId(id),
+                name,
+                password
+            };
+            const result = await tasksCollection.deleteOne(query);
+            res.send(result)
         })
 
 
