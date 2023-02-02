@@ -39,7 +39,7 @@ async function run() {
             const user = req.body;
             const isUserExist = await usersCollection.findOne(user);
             if (!isUserExist) {
-                return res.send({ message: 'User not found' })
+                return res.send({ message: 'Something went wrong' })
             }
             res.send({ user: user });
         })
@@ -164,6 +164,20 @@ async function run() {
                 const allTasks = await tasksCollection.find(query).toArray();
                 res.send(allTasks)
             }
+        })
+
+        //* search by title
+        app.get('/task-search', async (req, res) => {
+            const searchText = req.query.searchText;
+            const name = req.query.name;
+            const password = req.query.password;
+            const query = {
+                name,
+                password
+            };
+            const tasks = await tasksCollection.find(query).toArray();
+            const searchedTask = tasks.filter(task => task.title.includes(searchText));
+            res.send(searchedTask);
         })
 
     }
