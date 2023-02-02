@@ -143,6 +143,29 @@ async function run() {
             res.send(activeTasks);
         })
 
+        //* sorting
+        app.get('/tasks-sorting', async (req, res) => {
+            const sortValue = req.query.sortValue;
+            const name = req.query.name;
+            const password = req.query.password;
+            const query = {
+                name,
+                password
+            };
+            const allTasks = await tasksCollection.find(query).toArray();
+            if (sortValue === 'true') {
+                const completedTasks = allTasks.filter(task => task.status === true);
+                res.send(completedTasks);
+
+            } else if (sortValue === 'false') {
+                const activeTasks = allTasks.filter(task => task.status === false);
+                res.send(activeTasks)
+            } else if (sortValue === 'all') {
+                const allTasks = await tasksCollection.find(query).toArray();
+                res.send(allTasks)
+            }
+        })
+
     }
     finally {
 
